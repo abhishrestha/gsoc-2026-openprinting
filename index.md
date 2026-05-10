@@ -1,57 +1,188 @@
-# GSoC 2026 — Fuzz and Test the go-mfp CPython Binding
+# GSoC 2026 — Fuzzing & Testing the `go-mfp` CPython Binding
 
-**Student:** Abhishrestha Tiwari  
-**Organization:** Linux Foundation / OpenPrinting  
-**Mentor:** Alexander Pevzner, Till Kamppeter  
-**Project:** Fuzz and Test the go-mfp CPython Binding  
+**Contributor:**  
+Abhishrestha Tiwari
+
+**Organization:**  
+The Linux Foundation / OpenPrinting
+
+**Mentors:**  
+Alexander Pevzner, Till Kamppeter, ttfish
+
+**Project:**  
+*Fuzz and Test the `go-mfp` CPython Binding*
+
+---
 
 ## About the Project
 
-The go-mfp cpython package is a unique Go library that embeds CPython 
-as a scripting engine. This project builds a comprehensive unit test 
-and fuzz test suite for the package across Python 3.8–latest on both 
-x86 and ARM64.
+The `go-mfp/cpython` package is a Go library that embeds CPython as a scripting engine.
+This project focuses on building a comprehensive testing and fuzzing infrastructure for the package across Python 3.8 through the latest versions on both x86 and ARM64 architectures.
+
+The primary goals are:
+
+* Improve unit test coverage
+* Add fuzz testing for critical components
+* Detect architecture-specific issues
+* Ensure long-term reliability and maintainability
+
+---
 
 ## Contributions
 
-- [PR #21 — Fix ARM64 deadlock in cpython.Python.Close()](https://github.com/OpenPrinting/go-mfp/pull/21) ✅ Merged
-- [PR #50 — Add unit tests for error types](https://github.com/OpenPrinting/go-mfp/pull/50) Under Review
+### Merged Pull Requests
 
-## Weekly Updates
+* [PR #21 — Fix ARM64 deadlock in `cpython.Python.Close()`](https://github.com/OpenPrinting/go-mfp/pull/21) ✅
+* [PR #50 — Add unit tests for error types](https://github.com/OpenPrinting/go-mfp/pull/50) ✅
 
-### Week 1 — Community Bonding (May 1–7, 2026)
+---
 
-**What I did:**
-- Set up Lima VM (Ubuntu 25.10, aarch64) with all dependencies — Go, CPython, cgo toolchain
-- Ran coverage audit on the cpython package — overall coverage: 77.7%
-- Identified all functions at 0% coverage across error.go, gate.go, object.go, and python.go
-- Created `error_test.go` — a unit test suite for `error.go` in the cpython package
-- Tests cover all 6 error types: ErrPython, ErrTypeConversion, ErrOverflow, ErrClosed, ErrInvalidObject, ErrNotFound
-- Achieved 100% test coverage for error.go (previously 0%)
-- Submitted PR #50 and addressed Alexander's review feedback (copyright attribution, removing unintended python.go formatting changes)
-- Synced local repo with upstream master to pick up latest code changes (new `except` field in ErrPython)
-- Updated tests to match the new ErrPython format and verified all 8 tests pass
-- Set up Go static analysis tools: go vet, staticcheck
-- Configured GitHub authentication (Personal Access Token) for pushing to fork
+# Work Completed
 
-**Coverage improvement:**
-- error.go: 0% → 100%
-- Overall:  77.7% → 78.3% 
+## Environment Setup
 
-**What I learned:**
-- Go testing framework — writing unit tests with `testing.T` and table-driven test patterns
-- How the cpython package error types implement Go's `error` interface
-- Git workflow for contributing to open-source: fork → branch → PR → review → fix → push
-- Importance of following project code style — Alexander uses golint, go vet, and staticcheck with zero warnings expected
-- Each PR should be logically isolated and only touch relevant files
+Configured a complete ARM64 development and testing environment using Lima VM.
 
-**Challenges faced:**
-- VS Code Remote-SSH connection to Lima VM timed out due to network issues inside VM — used terminal-based micro editor as alternative
-- Upstream code changed between starting work and submitting PR — had to rebase and update tests for new ErrPython struct (added `except` field)
-- Accidentally included python.go formatting changes in the PR — learned to verify `git diff` before committing
+### Stack Used
 
-**Next steps:**
-- Get PR #50 merged
-- Write fuzz tests for error.go (`error_fuzz_test.go`)
-- Start unit tests for gate.go — has the most functions at 0% coverage (lastErrorLocation, typemodulename, setattr, getListItem, getTupleItem)
-- Continue with object.go and python.go unit tests
+* Ubuntu 25.10 (aarch64)
+* Go toolchain
+* CPython
+* cgo toolchain
+* Lima VM
+
+---
+
+## Coverage Audit
+
+Performed a detailed coverage analysis of the `cpython` package.
+
+### Initial Findings
+
+* Overall package coverage: **77.7%**
+* Multiple functions had **0% coverage**
+* Major uncovered areas:
+
+  * `error.go`
+  * `gate.go`
+  * `object.go`
+  * `python.go`
+
+---
+
+# Unit Testing Work
+
+## Added
+
+```text
+cpython/error_test.go
+```
+
+Implemented a dedicated unit test suite for all error types in `error.go`.
+
+### Covered Error Types
+
+* `ErrPython`
+* `ErrTypeConversion`
+* `ErrOverflow`
+* `ErrClosed`
+* `ErrInvalidObject`
+* `ErrNotFound`
+
+---
+
+## Results
+
+| File       | Before | After |
+| ---------- | ------ | ----- |
+| `error.go` | 0%     | 100%  |
+
+### Overall Package Coverage
+
+```text
+77.7% → 78.3%
+```
+
+All tests and static analysis checks passed successfully with zero warnings.
+
+---
+
+# Maintainer Review Improvements
+
+Based on maintainer feedback, the following refinements were made:
+
+* Replaced runtime interface checks with compile-time assertions
+
+```go
+var (
+    _ error = ErrPython{}
+)
+```
+
+* Updated tests after upstream changes introduced the `except` field in `ErrPython`
+* Removed unrelated formatting changes accidentally included in the PR
+* Aligned formatting and testing style with project conventions
+
+---
+
+# Validation & Quality Checks
+
+Validated the implementation using:
+
+```bash
+go test -v ./cpython/...
+golint ./cpython/...
+go vet ./cpython/...
+staticcheck ./cpython/...
+```
+
+### Standards Followed
+
+* `golint`
+* `go vet`
+* `staticcheck`
+
+All checks completed successfully without warnings.
+
+---
+
+# Development Workflow
+
+## Branch Strategy
+
+Using one branch per logical change:
+
+```text
+error-tests
+gate-tests
+object-tests
+python-tests
+error-fuzz-tests
+```
+
+---
+
+## PR Strategy
+
+Keeping pull requests:
+
+* Small
+* Focused
+* Logically isolated
+
+Separate PRs are submitted for:
+
+* Unit tests
+* Fuzz tests
+* Coverage improvements
+
+---
+
+# Current Focus
+
+Ongoing work includes:
+
+* Expanding unit test coverage for remaining files
+* Adding fuzz testing for critical APIs
+* Improving ARM64 stability and reproducibility
+* Increasing overall package coverage further
