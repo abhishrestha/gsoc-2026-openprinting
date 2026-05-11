@@ -63,10 +63,11 @@ Performed a detailed coverage analysis of the `cpython` package.
 * Multiple functions had **0% coverage**
 * Major uncovered areas:
 
-  * `error.go`
-  * `gate.go`
-  * `object.go`
-  * `python.go`
+* `except.go → except_test.go`
+* `float.go → float_test.go `
+* `gate.go → gate_test.go `
+* `objid.go → objid_test.go `
+* `reflect.go → reflect_test.go `
 
 ---
 
@@ -145,6 +146,32 @@ staticcheck ./cpython/...
 All checks completed successfully without warnings.
 
 ---
+```markdown
+## Added
+```text
+cpython/except_test.go
+
+```
+Implemented a dedicated unit test suite for the `Except` type and exception constants in `except.go`.
+
+### Covered
+* `TestExceptConstants` — verifies all standard exception constants have correct string values
+* `TestExceptObjectKnown` — verifies `object()` returns non-nil for all known standard exceptions
+* `TestExceptObjectUnknown` — verifies `object()` falls back to `SystemError` for unknown exception names
+
+---
+
+## Results
+| File        | Before | After |
+| ----------- | ------ | ----- |
+| `except.go` | 0%     | 100%  |
+
+### Overall Package Coverage
+```text
+78.3% → 78.9%
+```
+All tests and static analysis checks passed successfully with zero warnings.
+```
 
 # Development Workflow
 
